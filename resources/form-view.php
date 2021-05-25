@@ -1,18 +1,4 @@
 <!doctype html>
-<?php
-
-    $cookie_name = "shop";
-    $cookie_value = "empty";
-    setcookie($cookie_name, $cookie_value, time() + (86400 * 30), "/"); // 86400 = 1 day
-
-if(!isset($_COOKIE[$cookie_name])) {
-    echo "Cookie named '" . $cookie_name . "' is not set!";
-} else {
-    echo "Cookie '" . $cookie_name . "' is set!<br>";
-    echo "Value is: " . $_COOKIE[$cookie_name];
-}
-
-?>
 <html lang="en">
 <head>
     <!-- Required meta tags -->
@@ -33,7 +19,6 @@ if(!isset($_COOKIE[$cookie_name])) {
 <body>
 <?php
 include 'resources/checkValid.php';
-include 'resources/classes.php';
 ?>
 <div class="container">
     <h1>Order food in restaurant "the Personal Ham Processors"</h1>
@@ -50,7 +35,7 @@ include 'resources/classes.php';
     <form method="post">
         <div class="form-row">
             <div class="form-group col-md-6">
-                <label for="email">E-mail:<?php echo "<span style='color:red;'>".($Invalid->emailInval)."</span>"; ?></label>
+                <label for="email">E-mail:<?php echo "<span style='color:red;'>" . ($Invalid->emailInval) . "</span>"; ?></label>
                 <input value="<?php
 
                 if (isset($_SESSION["information"]["email"])) {
@@ -68,13 +53,14 @@ include 'resources/classes.php';
 
             <div class="form-row">
                 <div class="form-group col-md-6">
-                    <label for="street">Street: <?php echo "<span style='color:red;'>".($Invalid->streetInval)."</span>"; ?></label>
+                    <label for="street">Street: <?php echo "<span style='color:red;'>" . ($Invalid->streetInval) . "</span>"; ?></label>
                     <input value="<?php if (isset($_SESSION["information"]["street"])) {
                         echo $_SESSION["information"]["street"];
                     } ?>" type="text" name="street" id="street" class="form-control">
                 </div>
                 <div class="form-group col-md-6">
-                    <label for="streetnumber">Street number: <?php echo "<span style='color:red;'>".($Invalid->streetnrInval)."</span>"; ?></label>
+                    <label for="streetnumber">Street
+                        number: <?php echo "<span style='color:red;'>" . ($Invalid->streetnrInval) . "</span>"; ?></label>
                     <input value="<?php if (isset($_SESSION["information"]["streetnr"])) {
                         echo $_SESSION["information"]["streetnr"];
                     } ?>" type="text" id="streetnumber" name="streetnumber" class="form-control">
@@ -82,13 +68,13 @@ include 'resources/classes.php';
             </div>
             <div class="form-row">
                 <div class="form-group col-md-6">
-                    <label for="city">City: <?php echo "<span style='color:red;'>".($Invalid->cityInval)."</span>"; ?></label>
+                    <label for="city">City: <?php echo "<span style='color:red;'>" . ($Invalid->cityInval) . "</span>"; ?></label>
                     <input value="<?php if (isset($_SESSION["information"]["city"])) {
                         echo $_SESSION["information"]["city"];
                     } ?>" type="text" id="city" name="city" class="form-control">
                 </div>
                 <div class="form-group col-md-6">
-                    <label for="zipcode">Zipcode: <?php echo "<span style='color:red;'>".($Invalid->zipcodeInval)."</span>"; ?></label>
+                    <label for="zipcode">Zipcode: <?php echo "<span style='color:red;'>" . ($Invalid->zipcodeInval) . "</span>"; ?></label>
                     <input value="<?php if (isset($_SESSION["information"]["zipcode"])) {
                         echo $_SESSION["information"]["zipcode"];
                     } ?>" type="text" id="zipcode" name="zipcode" class="form-control">
@@ -103,37 +89,18 @@ include 'resources/classes.php';
             // for each loops through both food or drinks array and displays them.
             foreach ($products as $i => $product): ?>
                 <label>
-                    <input type="checkbox" value="1" name="products[<?php echo $i ?>]"/> <?php echo $product['name'] ?>
+                    <input value="<?php
+                    if (isset($_POST["products"][$i])) {
+                        echo $_POST["products"][$i];
+                    } ?>" min="0" type="number" placeholder="Amount"
+                           name="products[<?php echo $i ?>]"/> <?php echo $product['name'] ?>
                     -
                     &euro; <?php echo number_format($product['price'], 2) ?></label><br/>
             <?php endforeach;
 
 
+            whatIsHappening();
 
-
-            //redefine the totalvaliue var as an array
-            $totalValue = [];
-
-            //check if a product has been checken and compare this to the original products array.
-            if (isset($_POST["products"])) {
-                for ($i = 0; $i < count($_POST["products"]); $i++) {
-                    array_push($totalValue, $products[$i]["price"]);
-                    $_SESSION["order"][$i] = $products[$i]["name"];
-                    $_SESSION["price"][$i] = $products[$i]["price"];
-                }
-            }
-            //check if the express delivery has been checken, if not, return a 0.
-            if (isset($_POST["express_delivery"])) {
-                $delivery = (int)$_POST["express_delivery"];
-                $_SESSION["delivery"] = $delivery;
-            } else {
-                $delivery = 0;
-            }
-
-            //sum of the total products checked + the express delivery.
-            $totalValue = array_sum($totalValue) + $delivery;
-
-            whatIsHappening()
             ?>
         </fieldset>
 
@@ -141,16 +108,23 @@ include 'resources/classes.php';
             <input type="checkbox" name="express_delivery" value="5"/>
             Express delivery (+ 5 EUR)
         </label>
-        <button type="submit" class="btn btn-primary">Order!</button>
+        <button type="submit" class="btn btn-primary">Update order!</button>
     </form>
     <?php
-    if (isset($_SESSION["information"]) && isset($_SESSION["order"])) {
-        if (count($_SESSION["information"]) == 5 && count($_SESSION["order"]) >= 1 ) {
+    if (isset($_SESSION["information"]) && isset($_SESSION["order-food"]) || isset($_SESSION["order-drink"])) {
+        if (count($_SESSION["information"]) == 5 && count($_SESSION["order-food"]) >= 1 || count($_SESSION["order-drinks"]) >= 1) {
             include 'resources/confirmation.php';
         }
     }
     ?>
-    <footer>You already ordered <strong>&euro; <?php echo $totalValue ?></strong> in food and drinks.</footer>
+    <footer>You already ordered <strong>&euro; <?php
+            if (isset($_COOKIE["shop"])) {
+                echo (float)$_COOKIE["shop"] + $totalValue;
+            } else {
+                echo $totalValue;
+            }
+            ?></strong> in food and drinks.
+    </footer>
 </div>
 
 <style>
@@ -161,7 +135,7 @@ include 'resources/classes.php';
 </body>
 
 <!-- Optional JavaScript -->
-<script src="../resources/functions.js"></script>
+<script defer src="../resources/functions.js"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/v4-shims.min.js"></script>
 
