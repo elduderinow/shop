@@ -36,13 +36,7 @@ include 'resources/checkValid.php';
         <div class="form-row">
             <div class="form-group col-md-6">
                 <label for="email">E-mail:<?php echo "<span style='color:red;'>" . ($Invalid->emailInval) . "</span>"; ?></label>
-                <input value="<?php
-
-                if (isset($_SESSION["information"]["email"])) {
-                    echo $_SESSION["information"]["email"];
-                }
-
-                ?>" type="text" id="email" name="email" class="form-control"/>
+                <input value="<?php if (isset($_SESSION["information"]["email"])) { echo $_SESSION["information"]["email"];}?>" type="text" id="email" name="email" class="form-control"/>
             </div>
 
 
@@ -54,30 +48,22 @@ include 'resources/checkValid.php';
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label for="street">Street: <?php echo "<span style='color:red;'>" . ($Invalid->streetInval) . "</span>"; ?></label>
-                    <input value="<?php if (isset($_SESSION["information"]["street"])) {
-                        echo $_SESSION["information"]["street"];
-                    } ?>" type="text" name="street" id="street" class="form-control">
+                    <input value="<?php if (isset($_SESSION["information"]["street"])) {echo $_SESSION["information"]["street"];} ?>" type="text" name="street" id="street" class="form-control">
                 </div>
                 <div class="form-group col-md-6">
                     <label for="streetnumber">Street
                         number: <?php echo "<span style='color:red;'>" . ($Invalid->streetnrInval) . "</span>"; ?></label>
-                    <input value="<?php if (isset($_SESSION["information"]["streetnr"])) {
-                        echo $_SESSION["information"]["streetnr"];
-                    } ?>" type="text" id="streetnumber" name="streetnumber" class="form-control">
+                    <input value="<?php if (isset($_SESSION["information"]["streetnr"])) {echo $_SESSION["information"]["streetnr"];} ?>" type="text" id="streetnumber" name="streetnumber" class="form-control">
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label for="city">City: <?php echo "<span style='color:red;'>" . ($Invalid->cityInval) . "</span>"; ?></label>
-                    <input value="<?php if (isset($_SESSION["information"]["city"])) {
-                        echo $_SESSION["information"]["city"];
-                    } ?>" type="text" id="city" name="city" class="form-control">
+                    <input value="<?php if (isset($_SESSION["information"]["city"])) {echo $_SESSION["information"]["city"];} ?>" type="text" id="city" name="city" class="form-control">
                 </div>
                 <div class="form-group col-md-6">
                     <label for="zipcode">Zipcode: <?php echo "<span style='color:red;'>" . ($Invalid->zipcodeInval) . "</span>"; ?></label>
-                    <input value="<?php if (isset($_SESSION["information"]["zipcode"])) {
-                        echo $_SESSION["information"]["zipcode"];
-                    } ?>" type="text" id="zipcode" name="zipcode" class="form-control">
+                    <input value="<?php if (isset($_SESSION["information"]["zipcode"])) {echo $_SESSION["information"]["zipcode"];} ?>" type="text" id="zipcode" name="zipcode" class="form-control">
                 </div>
             </div>
         </fieldset>
@@ -98,14 +84,13 @@ include 'resources/checkValid.php';
                     &euro; <?php echo number_format($product['price'], 2) ?></label><br/>
             <?php endforeach;
 
-
-            whatIsHappening();
-
             ?>
         </fieldset>
 
         <label>
-            <input type="checkbox" name="express_delivery" value="5"/>
+            <input <?php if (isset($_SESSION["delivery"])) {
+                echo "checked";
+            } ?> type="checkbox" name="express_delivery" value="5"/>
             Express delivery (+ 5 EUR)
         </label>
         <button type="submit" class="btn btn-primary">Update order!</button>
